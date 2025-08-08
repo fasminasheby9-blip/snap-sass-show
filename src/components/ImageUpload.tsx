@@ -1,13 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+import { Upload, Image as ImageIcon, Camera } from 'lucide-react';
 
 interface ImageUploadProps {
   onImageUpload: (file: File) => void;
+  onCameraCapture: () => void;
   hasImage: boolean;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, hasImage }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({ 
+  onImageUpload, 
+  onCameraCapture, 
+  hasImage 
+}) => {
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -32,13 +37,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, hasImag
     }
   }, [onImageUpload]);
 
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onImageUpload(file);
-    }
-  }, [onImageUpload]);
-
   const triggerFileInput = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -58,10 +56,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, hasImag
         className={`
           relative border-4 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer
           ${isDragOver 
-            ? 'border-primary bg-gradient-primary bg-opacity-10 scale-105' 
-            : 'border-border bg-card hover:border-primary hover:bg-gradient-primary hover:bg-opacity-5'
+            ? 'border-primary bg-gradient-primary bg-opacity-10 scale-105 shadow-hover' 
+            : 'border-border bg-card/90 backdrop-blur-sm hover:border-primary hover:bg-gradient-primary hover:bg-opacity-5 hover:scale-102'
           }
-          ${hasImage ? 'border-accent' : ''}
+          ${hasImage ? 'border-accent shadow-playful' : 'shadow-playful'}
         `}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -86,9 +84,31 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, hasImag
             </p>
           </div>
           
-          <Button variant="playful" size="lg" className="mt-4">
-            {hasImage ? 'Choose New Image' : 'Browse Files'}
-          </Button>
+          <div className="flex gap-3 justify-center">
+            <Button variant="playful" size="lg">
+              <Upload className="w-4 h-4 mr-2" />
+              {hasImage ? 'New Image' : 'Browse Files'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCameraCapture();
+              }}
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Camera
+            </Button>
+          </div>
+        </div>
+
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-4 left-4 w-2 h-2 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-8 right-6 w-1 h-1 bg-accent/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-secondary/50 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
         </div>
       </div>
     </div>
